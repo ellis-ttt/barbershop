@@ -8,8 +8,9 @@ import (
 
 func main() {
 	r := gin.Default()
+	r.LoadHTMLGlob("templates/*")
 	r.GET("/", func(c *gin.Context) {
-		c.String(200, "Бритва — скоро открытие")
+		c.HTML(200, "index.html", nil)
 	})
 	log.Fatal(r.Run(":8080"))
 }

@@ -10,7 +10,9 @@
 <h1 class="text-3xl font-bold">Бритва</h1>
 <p>Lorem ipsum dolor sit amet.</p>
 <h2 class="text-xl mt-6">Услуги</h2>
-<p>TODO</p>
+<ul>
+{{range .Services}}<li>{{.Name}} — {{.Price}} ₽, {{.DurationMin}} мин</li>
+{{end}}</ul>
 <h2 class="text-xl mt-6">Контакты</h2>
 <p>TODO</p>
 </body>

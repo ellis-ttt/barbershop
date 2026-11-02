@@ -7,13 +7,44 @@
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="max-w-3xl mx-auto p-4">
+<header class="py-8">
 <h1 class="text-3xl font-bold">Бритва</h1>
 <p>Lorem ipsum dolor sit amet.</p>
-<h2 class="text-xl mt-6">Услуги</h2>
+<a href="#booking" class="inline-block mt-4 border px-4 py-2">Записаться</a>
+</header>
+
+<section class="mt-6">
+<h2 class="text-xl">Услуги и цены</h2>
 <ul>
-{{range .Services}}<li>{{.Name}} — {{.Price}} ₽, {{.DurationMin}} мин</li>
+{{range .Services}}<li class="flex justify-between border-b py-2"><span>{{.Name}}</span><span>{{.Price}} ₽</span></li>
 {{end}}</ul>
-<h2 class="text-xl mt-6">Контакты</h2>
-<p>TODO</p>
+</section>
+
+<section class="mt-6">
+<h2 class="text-xl">Мастера</h2>
+<ul>
+{{range .Barbers}}<li>{{.Name}}</li>
+{{end}}</ul>
+</section>
+
+<section class="mt-6">
+<h2 class="text-xl">Галерея</h2>
+<div class="grid grid-cols-3 gap-2">
+<div class="aspect-square bg-gray-200"></div>
+<div class="aspect-square bg-gray-200"></div>
+<div class="aspect-square bg-gray-200"></div>
+</div>
+</section>
+
+<section id="booking" class="mt-6">
+<h2 class="text-xl">Запись</h2>
+<p>Скоро</p>
+</section>
+
+<section class="mt-6">
+<h2 class="text-xl">Контакты</h2>
+<p>Москва, ул. Примерная, 1</p>
+<p>+7 (999) 000-00-00</p>
+</section>
 </body>
 </html>

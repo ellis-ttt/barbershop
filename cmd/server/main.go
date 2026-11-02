@@ -20,6 +20,11 @@ type Service struct {
 	DurationMin int
 }
 
+type Barber struct {
+	ID   int64
+	Name string
+}
+
 func main() {
 	ctx := context.Background()
 	dsn := os.Getenv("DATABASE_URL")
@@ -49,7 +54,13 @@ func main() {
 			c.String(500, err.Error())
 			return
 		}
-		c.HTML(200, "index.html", gin.H{"Services": services})
+		rows, _ = db.Query(c, "SELECT id, name FROM barbers ORDER BY id")
+		barbers, err := pgx.CollectRows(rows, pgx.RowToStructByPos[Barber])
+		if err != nil {
+			c.String(500, err.Error())
+			return
+		}
+		c.HTML(200, "index.html", gin.H{"Services": services, "Barbers": barbers})
 	})
 	log.Fatal(r.Run(":8080"))
 }

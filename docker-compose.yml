@@ -14,6 +14,8 @@ services:
     build: .
     ports:
       - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://barber:barber@db:5432/barbershop
     depends_on:
       - db
 

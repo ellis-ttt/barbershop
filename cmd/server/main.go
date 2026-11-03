@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"log"
 	"os"
+	"time"
 
 	"barbershop/migrations"
 
@@ -61,6 +62,28 @@ func main() {
 			return
 		}
 		c.HTML(200, "index.html", gin.H{"Services": services, "Barbers": barbers})
+	})
+	r.POST("/booking", func(c *gin.Context) {
+		start, err := time.Parse("2006-01-02T15:04", c.PostForm("starts_at"))
+		if err != nil {
+			c.String(400, "bad date")
+			return
+		}
+		var duration int
+		err = db.QueryRow(c, "SELECT duration_min FROM services WHERE id = $1", c.PostForm("service_id")).Scan(&duration)
+		if err != nil {
+			c.String(400, "bad service")
+			return
+		}
+		_, err = db.Exec(c, `INSERT INTO bookings (service_id, barber_id, starts_at, ends_at, client_name, client_phone)
+			VALUES ($1, $2, $3, $4, $5, $6)`,
+			c.PostForm("service_id"), c.PostForm("barber_id"), start, start.Add(time.Duration(duration)*time.Minute),
+			c.PostForm("name"), c.PostForm("phone"))
+		if err != nil {
+			c.String(500, err.Error())
+			return
+		}
+		c.String(200, "Спасибо! Вы записаны.")
 	})
 	log.Fatal(r.Run(":8080"))
 }

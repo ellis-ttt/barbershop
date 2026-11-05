@@ -7,7 +7,5 @@ RUN CGO_ENABLED=0 go build -o /app ./cmd/server
 
 FROM alpine:3.22
 COPY --from=build /app /app
-COPY templates /templates
-WORKDIR /
 EXPOSE 8080
 CMD ["/app"]

@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"net/http"
 	"path"
+	"time"
 
 	"barbershop/internal/store"
 
@@ -22,15 +23,18 @@ type Store interface {
 	Service(ctx context.Context, id int64) (store.Service, error)
 	Barbers(ctx context.Context) ([]store.Barber, error)
 	CreateBooking(ctx context.Context, b store.Booking) error
+	Bookings(ctx context.Context, from, to time.Time) ([]store.Booking, error)
 }
 
 type Server struct {
-	store Store
-	pages map[string]*template.Template
+	store    Store
+	partials *template.Template
+	pages    map[string]*template.Template
 }
 
 func New(st Store) *Server {
-	return &Server{store: st, pages: loadPages()}
+	partials := template.Must(template.ParseFS(files, "templates/layout.html", "templates/partials/*.html"))
+	return &Server{store: st, partials: partials, pages: loadPages(partials)}
 }
 
 func (s *Server) Routes() *gin.Engine {
@@ -38,12 +42,14 @@ func (s *Server) Routes() *gin.Engine {
 	static, _ := fs.Sub(files, "static")
 	r.StaticFS("/static", http.FS(static))
 	r.GET("/", s.index)
+	r.GET("/booking/date", s.bookingDate)
+	r.GET("/booking/slots", s.bookingSlots)
+	r.GET("/booking/details", s.bookingDetails)
 	r.POST("/booking", s.createBooking)
 	return r
 }
 
-func loadPages() map[string]*template.Template {
-	base := template.Must(template.ParseFS(files, "templates/layout.html"))
+func loadPages(base *template.Template) map[string]*template.Template {
 	names, _ := fs.Glob(files, "templates/pages/*.html")
 	pages := map[string]*template.Template{}
 	for _, name := range names {
@@ -54,4 +60,8 @@ func loadPages() map[string]*template.Template {
 
 func (s *Server) render(c *gin.Context, page string, data any) {
 	c.Render(http.StatusOK, render.HTML{Template: s.pages[page], Name: "layout", Data: data})
+}
+
+func (s *Server) partial(c *gin.Context, name string, data any) {
+	c.Render(http.StatusOK, render.HTML{Template: s.partials, Name: name, Data: data})
 }

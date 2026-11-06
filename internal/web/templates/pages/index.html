@@ -30,14 +30,7 @@
 
 <section id="booking" class="mt-6">
 <h2 class="text-xl">Запись</h2>
-<form method="post" action="/booking" class="grid gap-2">
-<select name="service_id">{{range .Services}}<option value="{{.ID}}">{{.Name}}</option>{{end}}</select>
-<select name="barber_id">{{range .Barbers}}<option value="{{.ID}}">{{.Name}}</option>{{end}}</select>
-<input type="datetime-local" name="starts_at" required>
-<input name="name" placeholder="Имя" required>
-<input name="phone" placeholder="Телефон" required>
-<button class="border px-4 py-2">Записаться</button>
-</form>
+<div id="booking-step">{{template "booking-services" .Services}}</div>
 </section>
 
 <section class="mt-6">

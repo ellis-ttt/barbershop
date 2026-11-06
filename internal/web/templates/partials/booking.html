@@ -1,0 +1,41 @@
+{{define "booking-services"}}
+<p>Выберите услугу</p>
+<div class="grid gap-2">
+{{range .}}<button class="border p-2 text-left" hx-get="/booking/date?service_id={{.ID}}" hx-target="#booking-step">{{.Name}} — {{.Price}} ₽</button>
+{{end}}</div>
+{{end}}
+
+{{define "booking-date"}}
+<p>{{.Service.Name}}. Выберите дату</p>
+<input type="date" name="date" hx-get="/booking/slots?service_id={{.Service.ID}}" hx-trigger="change" hx-target="#slots">
+<div id="slots"></div>
+{{end}}
+
+{{define "booking-slots"}}
+<div class="overflow-x-auto">
+<table class="w-full text-center">
+<tr><th></th>{{range .Barbers}}<th>{{.Name}}</th>{{end}}</tr>
+{{range .Rows}}<tr>
+<td>{{.Time.Format "15:04"}}</td>
+{{range .Cells}}<td>{{if .Free}}<button class="border w-full" hx-get="/booking/details?service_id={{$.Service.ID}}&barber_id={{.BarberID}}&starts_at={{.Time.Format "2006-01-02T15:04"}}" hx-target="#booking-step">✓</button>{{else}}<span class="text-gray-300">—</span>{{end}}</td>{{end}}
+</tr>
+{{end}}</table>
+</div>
+{{end}}
+
+{{define "booking-details"}}
+<p>{{.Service.Name}}, {{.Start.Format "02.01.2006 15:04"}}</p>
+<form hx-post="/booking" hx-target="#booking-step" class="grid gap-2">
+<input type="hidden" name="service_id" value="{{.Service.ID}}">
+<input type="hidden" name="barber_id" value="{{.BarberID}}">
+<input type="hidden" name="starts_at" value="{{.Start.Format "2006-01-02T15:04"}}">
+<input name="name" placeholder="Имя" required>
+<input name="phone" type="tel" placeholder="Телефон" required>
+<button class="border p-2">Записаться</button>
+</form>
+{{end}}
+
+{{define "booking-done"}}
+<p>Спасибо, {{.Booking.ClientName}}! Вы записаны.</p>
+<p>{{.Service.Name}}, {{.Booking.StartsAt.Format "02.01.2006 15:04"}}</p>
+{{end}}

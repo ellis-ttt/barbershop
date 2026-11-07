@@ -51,3 +51,8 @@
 <p>Спасибо, {{.Booking.ClientName}}! Вы записаны.</p>
 <p>{{.Service.Name}}, {{.Booking.StartsAt.Format "02.01.2006 15:04"}}</p>
 {{end}}
+
+{{define "booking-taken"}}
+<p>Это время уже заняли. Выберите другое.</p>
+<button class="border p-2" hx-get="/booking/date?service_id={{.Service.ID}}" hx-target="#booking-step">Назад</button>
+{{end}}

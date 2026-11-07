@@ -1,6 +1,7 @@
 package web
 
 import (
+	"errors"
 	"net/http"
 	"slices"
 	"strconv"
@@ -119,7 +120,12 @@ func (s *Server) createBooking(c *gin.Context) {
 		ClientName:  c.PostForm("name"),
 		ClientPhone: c.PostForm("phone"),
 	}
-	if err := s.store.CreateBooking(c, b); err != nil {
+	err = s.store.CreateBooking(c, b)
+	if errors.Is(err, store.ErrSlotTaken) {
+		s.partial(c, "booking-taken", gin.H{"Service": service})
+		return
+	}
+	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}

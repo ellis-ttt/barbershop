@@ -2,10 +2,14 @@ package store
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
+
+var ErrSlotTaken = errors.New("slot taken")
 
 func (s *Store) Services(ctx context.Context) ([]Service, error) {
 	rows, _ := s.db.Query(ctx, "SELECT id, name, price, duration_min FROM services ORDER BY id")
@@ -26,6 +30,14 @@ func (s *Store) CreateBooking(ctx context.Context, b Booking) error {
 	_, err := s.db.Exec(ctx, `INSERT INTO bookings (service_id, barber_id, starts_at, ends_at, client_name, client_phone)
 		VALUES ($1, $2, $3, $4, $5, $6)`,
 		b.ServiceID, b.BarberID, b.StartsAt, b.EndsAt, b.ClientName, b.ClientPhone)
+	return slotErr(err)
+}
+
+func slotErr(err error) error {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "23P01" {
+		return ErrSlotTaken
+	}
 	return err
 }
 

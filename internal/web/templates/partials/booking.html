@@ -7,7 +7,19 @@
 
 {{define "booking-date"}}
 <p>{{.Service.Name}}. Выберите дату</p>
-<input type="date" name="date" hx-get="/booking/slots?service_id={{.Service.ID}}" hx-trigger="change" hx-target="#slots">
+<div x-data="calendar({{.Service.ID}})" class="max-w-xs">
+<div class="flex justify-between">
+<button @click="shift(-1)">‹</button>
+<span x-text="title"></span>
+<button @click="shift(1)">›</button>
+</div>
+<div class="grid grid-cols-7 text-center">
+<span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+<template x-for="(d, i) in days" :key="i">
+<div><button x-show="d" x-text="d && d.getDate()" :disabled="d && past(d)" @click="pick(d)" :class="d && iso(d) === selected && 'bg-black text-white'" class="w-full p-1 disabled:text-gray-300"></button></div>
+</template>
+</div>
+</div>
 <div id="slots"></div>
 {{end}}
 

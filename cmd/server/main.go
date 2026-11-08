@@ -3,19 +3,16 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 
+	"barbershop/internal/config"
 	"barbershop/internal/store"
 	"barbershop/internal/web"
 )
 
 func main() {
 	ctx := context.Background()
-	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" {
-		dsn = "postgres://barber:barber@localhost:5432/barbershop"
-	}
-	st, err := store.New(ctx, dsn)
+	cfg := config.Load()
+	st, err := store.New(ctx, cfg.DatabaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,5 +20,5 @@ func main() {
 	if err := st.Migrate(ctx); err != nil {
 		log.Fatal(err)
 	}
-	log.Fatal(web.New(st).Routes().Run(":8080"))
+	log.Fatal(web.New(st).Routes().Run(cfg.Addr))
 }

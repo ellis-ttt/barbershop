@@ -7,6 +7,8 @@ import (
 	"barbershop/internal/config"
 	"barbershop/internal/store"
 	"barbershop/internal/web"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func main() {
@@ -18,6 +20,13 @@ func main() {
 	}
 	defer st.Close()
 	if err := st.Migrate(ctx); err != nil {
+		log.Fatal(err)
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(cfg.AdminPassword), bcrypt.DefaultCost)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := st.SaveAdmin(ctx, cfg.AdminLogin, string(hash)); err != nil {
 		log.Fatal(err)
 	}
 	log.Fatal(web.New(st).Routes().Run(cfg.Addr))

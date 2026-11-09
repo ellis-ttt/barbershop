@@ -46,3 +46,15 @@ func (s *Store) Bookings(ctx context.Context, from, to time.Time) ([]Booking, er
 		FROM bookings WHERE starts_at < $2 AND ends_at > $1 ORDER BY starts_at`, from, to)
 	return pgx.CollectRows(rows, pgx.RowToStructByPos[Booking])
 }
+
+func (s *Store) SaveAdmin(ctx context.Context, login, hash string) error {
+	_, err := s.db.Exec(ctx, `INSERT INTO admins (login, password_hash) VALUES ($1, $2)
+		ON CONFLICT (login) DO UPDATE SET password_hash = EXCLUDED.password_hash`, login, hash)
+	return err
+}
+
+func (s *Store) AdminHash(ctx context.Context, login string) (string, error) {
+	var hash string
+	err := s.db.QueryRow(ctx, "SELECT password_hash FROM admins WHERE login = $1", login).Scan(&hash)
+	return hash, err
+}

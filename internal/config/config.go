@@ -4,13 +4,17 @@ import "os"
 
 type Config struct {
 	Addr        string
-	DatabaseURL string
+	DatabaseURL   string
+	AdminLogin    string
+	AdminPassword string
 }
 
 func Load() Config {
 	return Config{
 		Addr:        env("ADDR", ":8080"),
 		DatabaseURL: env("DATABASE_URL", "postgres://barber:barber@localhost:5432/barbershop"),
+		AdminLogin:    env("ADMIN_LOGIN", "admin"),
+		AdminPassword: env("ADMIN_PASSWORD", "admin"),
 	}
 }
 

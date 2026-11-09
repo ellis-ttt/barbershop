@@ -24,6 +24,7 @@ type Store interface {
 	Barbers(ctx context.Context) ([]store.Barber, error)
 	CreateBooking(ctx context.Context, b store.Booking) error
 	Bookings(ctx context.Context, from, to time.Time) ([]store.Booking, error)
+	AdminHash(ctx context.Context, login string) (string, error)
 }
 
 type Server struct {
@@ -46,6 +47,8 @@ func (s *Server) Routes() *gin.Engine {
 	r.GET("/booking/slots", s.bookingSlots)
 	r.GET("/booking/details", s.bookingDetails)
 	r.POST("/booking", s.createBooking)
+	r.GET("/admin/login", s.loginPage)
+	r.POST("/admin/login", s.login)
 	return r
 }
 

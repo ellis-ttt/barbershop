@@ -1,0 +1,9 @@
+{{define "content"}}
+<h1 class="text-2xl">Вход</h1>
+{{with .}}<p class="text-red-600">{{.Error}}</p>{{end}}
+<form method="post" class="grid gap-2 max-w-xs">
+<input name="login" placeholder="Логин" required>
+<input name="password" type="password" placeholder="Пароль" required>
+<button class="border p-2">Войти</button>
+</form>
+{{end}}

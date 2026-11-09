@@ -16,6 +16,9 @@ services:
       - "8080:8080"
     environment:
       DATABASE_URL: postgres://barber:barber@db:5432/barbershop
+      ADMIN_LOGIN: admin
+      ADMIN_PASSWORD: admin
+      JWT_SECRET: change-me
     depends_on:
       - db
 

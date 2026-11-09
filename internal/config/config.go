@@ -7,6 +7,7 @@ type Config struct {
 	DatabaseURL   string
 	AdminLogin    string
 	AdminPassword string
+	JWTSecret     string
 }
 
 func Load() Config {
@@ -15,6 +16,7 @@ func Load() Config {
 		DatabaseURL: env("DATABASE_URL", "postgres://barber:barber@localhost:5432/barbershop"),
 		AdminLogin:    env("ADMIN_LOGIN", "admin"),
 		AdminPassword: env("ADMIN_PASSWORD", "admin"),
+		JWTSecret:     env("JWT_SECRET", "dev-secret"),
 	}
 }
 

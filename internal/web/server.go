@@ -31,11 +31,12 @@ type Server struct {
 	store    Store
 	partials *template.Template
 	pages    map[string]*template.Template
+	secret   []byte
 }
 
-func New(st Store) *Server {
+func New(st Store, secret string) *Server {
 	partials := template.Must(template.ParseFS(files, "templates/layout.html", "templates/partials/*.html"))
-	return &Server{store: st, partials: partials, pages: loadPages(partials)}
+	return &Server{store: st, partials: partials, pages: loadPages(partials), secret: []byte(secret)}
 }
 
 func (s *Server) Routes() *gin.Engine {
@@ -49,6 +50,10 @@ func (s *Server) Routes() *gin.Engine {
 	r.POST("/booking", s.createBooking)
 	r.GET("/admin/login", s.loginPage)
 	r.POST("/admin/login", s.login)
+	r.POST("/admin/logout", s.logout)
+
+	admin := r.Group("/admin", s.requireAdmin)
+	admin.GET("", s.dashboard)
 	return r
 }
 

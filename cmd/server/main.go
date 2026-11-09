@@ -29,5 +29,5 @@ func main() {
 	if err := st.SaveAdmin(ctx, cfg.AdminLogin, string(hash)); err != nil {
 		log.Fatal(err)
 	}
-	log.Fatal(web.New(st).Routes().Run(cfg.Addr))
+	log.Fatal(web.New(st, cfg.JWTSecret).Routes().Run(cfg.Addr))
 }

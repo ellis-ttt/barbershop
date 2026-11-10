@@ -3,5 +3,31 @@
 <h1 class="text-2xl">Записи</h1>
 <form method="post" action="/admin/logout"><button>Выйти</button></form>
 </div>
-<p>TODO</p>
+
+{{$view := "day"}}{{if .Week}}{{$view = "week"}}{{end}}
+<div class="flex gap-4 my-4">
+<a href="?view={{$view}}&date={{.Prev.Format "2006-01-02"}}">‹</a>
+<span>{{.Day.Format "02.01.2006"}}</span>
+<a href="?view={{$view}}&date={{.Next.Format "2006-01-02"}}">›</a>
+<a href="?view=day&date={{.Day.Format "2006-01-02"}}">День</a>
+<a href="?view=week&date={{.Day.Format "2006-01-02"}}">Неделя</a>
+</div>
+
+{{if .Week}}
+{{range .Days}}
+<h2 class="font-bold mt-4">{{.Day.Format "02.01"}}</h2>
+{{range .Bookings}}<p>{{.StartsAt.Format "15:04"}} {{.BarberName}} — {{.ServiceName}}, {{.ClientName}} {{.ClientPhone}}</p>
+{{else}}<p class="text-gray-400">Нет записей</p>{{end}}
+{{end}}
+{{else}}
+<div class="overflow-x-auto">
+<table class="w-full text-sm">
+<tr><th></th>{{range .Barbers}}<th>{{.Name}}</th>{{end}}</tr>
+{{range .Rows}}<tr>
+<td>{{.Time.Format "15:04"}}</td>
+{{range .Cells}}<td class="{{if .Booking}}bg-gray-200{{end}}">{{if .Start}}{{.Booking.ServiceName}}, {{.Booking.ClientName}} {{.Booking.ClientPhone}}{{end}}</td>{{end}}
+</tr>
+{{end}}</table>
+</div>
+{{end}}
 {{end}}

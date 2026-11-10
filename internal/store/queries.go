@@ -42,8 +42,12 @@ func slotErr(err error) error {
 }
 
 func (s *Store) Bookings(ctx context.Context, from, to time.Time) ([]Booking, error) {
-	rows, _ := s.db.Query(ctx, `SELECT id, service_id, barber_id, starts_at, ends_at, client_name, client_phone
-		FROM bookings WHERE starts_at < $2 AND ends_at > $1 ORDER BY starts_at`, from, to)
+	rows, _ := s.db.Query(ctx, `SELECT b.id, b.service_id, b.barber_id, b.starts_at, b.ends_at, b.client_name, b.client_phone, s.name, br.name
+		FROM bookings b
+		JOIN services s ON s.id = b.service_id
+		JOIN barbers br ON br.id = b.barber_id
+		WHERE b.starts_at < $2 AND b.ends_at > $1
+		ORDER BY b.starts_at`, from, to)
 	return pgx.CollectRows(rows, pgx.RowToStructByPos[Booking])
 }
 

@@ -26,4 +26,6 @@ type Booking struct {
 	EndsAt      time.Time
 	ClientName  string
 	ClientPhone string
+	ServiceName string
+	BarberName  string
 }

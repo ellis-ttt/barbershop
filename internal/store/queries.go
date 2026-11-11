@@ -33,6 +33,17 @@ func (s *Store) CreateBooking(ctx context.Context, b Booking) error {
 	return slotErr(err)
 }
 
+func (s *Store) CancelBooking(ctx context.Context, id int64) error {
+	_, err := s.db.Exec(ctx, "UPDATE bookings SET status = 'cancelled' WHERE id = $1", id)
+	return err
+}
+
+func (s *Store) RescheduleBooking(ctx context.Context, id, barberID int64, start time.Time) error {
+	_, err := s.db.Exec(ctx, `UPDATE bookings SET barber_id = $2, ends_at = $3 + (ends_at - starts_at), starts_at = $3
+		WHERE id = $1`, id, barberID, start)
+	return slotErr(err)
+}
+
 func slotErr(err error) error {
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == "23P01" {
@@ -46,7 +57,7 @@ func (s *Store) Bookings(ctx context.Context, from, to time.Time) ([]Booking, er
 		FROM bookings b
 		JOIN services s ON s.id = b.service_id
 		JOIN barbers br ON br.id = b.barber_id
-		WHERE b.starts_at < $2 AND b.ends_at > $1
+		WHERE b.status = 'active' AND b.starts_at < $2 AND b.ends_at > $1
 		ORDER BY b.starts_at`, from, to)
 	return pgx.CollectRows(rows, pgx.RowToStructByPos[Booking])
 }

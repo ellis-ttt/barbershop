@@ -15,7 +15,7 @@
 
 {{if .Week}}
 {{range .Days}}
-<h2 class="font-bold mt-4">{{.Day.Format "02.01"}}</h2>
+<h2 class="font-bold mt-4"><a href="?date={{.Day.Format "2006-01-02"}}">{{.Day.Format "02.01"}}</a></h2>
 {{range .Bookings}}<p>{{.StartsAt.Format "15:04"}} {{.BarberName}} — {{.ServiceName}}, {{.ClientName}} {{.ClientPhone}}</p>
 {{else}}<p class="text-gray-400">Нет записей</p>{{end}}
 {{end}}
@@ -25,9 +25,24 @@
 <tr><th></th>{{range .Barbers}}<th>{{.Name}}</th>{{end}}</tr>
 {{range .Rows}}<tr>
 <td>{{.Time.Format "15:04"}}</td>
-{{range .Cells}}<td class="{{if .Booking}}bg-gray-200{{end}}">{{if .Start}}{{.Booking.ServiceName}}, {{.Booking.ClientName}} {{.Booking.ClientPhone}}{{end}}</td>{{end}}
+{{range .Cells}}<td class="{{if .Booking}}bg-gray-200{{end}}">{{if .Start}}{{template "booking-admin" dict "Booking" .Booking "Barbers" $.Barbers}}{{end}}</td>{{end}}
 </tr>
 {{end}}</table>
 </div>
 {{end}}
+{{end}}
+
+{{define "booking-admin"}}
+<details>
+<summary>{{.Booking.ServiceName}}, {{.Booking.ClientName}}</summary>
+<p>{{.Booking.ClientPhone}}</p>
+<form method="post" action="/admin/bookings/{{.Booking.ID}}/reschedule" class="grid gap-1">
+<select name="barber_id">{{range .Barbers}}<option value="{{.ID}}" {{if eq .ID $.Booking.BarberID}}selected{{end}}>{{.Name}}</option>{{end}}</select>
+<input type="datetime-local" name="starts_at" value="{{.Booking.StartsAt.Format "2006-01-02T15:04"}}" step="1800">
+<button class="border">Перенести</button>
+</form>
+<form method="post" action="/admin/bookings/{{.Booking.ID}}/cancel" onsubmit="return confirm('Отменить запись?')">
+<button class="border text-red-600">Отменить</button>
+</form>
+</details>
 {{end}}

@@ -24,6 +24,8 @@ type Store interface {
 	Barbers(ctx context.Context) ([]store.Barber, error)
 	CreateBooking(ctx context.Context, b store.Booking) error
 	Bookings(ctx context.Context, from, to time.Time) ([]store.Booking, error)
+	CancelBooking(ctx context.Context, id int64) error
+	RescheduleBooking(ctx context.Context, id, barberID int64, start time.Time) error
 	AdminHash(ctx context.Context, login string) (string, error)
 }
 
@@ -35,7 +37,7 @@ type Server struct {
 }
 
 func New(st Store, secret string) *Server {
-	partials := template.Must(template.ParseFS(files, "templates/layout.html", "templates/partials/*.html"))
+	partials := template.Must(template.New("").Funcs(funcs).ParseFS(files, "templates/layout.html", "templates/partials/*.html"))
 	return &Server{store: st, partials: partials, pages: loadPages(partials), secret: []byte(secret)}
 }
 
@@ -54,6 +56,8 @@ func (s *Server) Routes() *gin.Engine {
 
 	admin := r.Group("/admin", s.requireAdmin)
 	admin.GET("", s.dashboard)
+	admin.POST("/bookings/:id/cancel", s.cancelBooking)
+	admin.POST("/bookings/:id/reschedule", s.rescheduleBooking)
 	return r
 }
 
@@ -64,6 +68,16 @@ func loadPages(base *template.Template) map[string]*template.Template {
 		pages[path.Base(name)] = template.Must(template.Must(base.Clone()).ParseFS(files, name))
 	}
 	return pages
+}
+
+var funcs = template.FuncMap{
+	"dict": func(kv ...any) map[string]any {
+		m := map[string]any{}
+		for i := 0; i < len(kv); i += 2 {
+			m[kv[i].(string)] = kv[i+1]
+		}
+		return m
+	},
 }
 
 func (s *Server) render(c *gin.Context, page string, data any) {

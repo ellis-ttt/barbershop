@@ -14,6 +14,7 @@ import (
 
 type adminCell struct {
 	Booking *store.Booking
+	Block   *store.Block
 	Start   bool
 }
 
@@ -48,17 +49,22 @@ func (s *Server) dashboard(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	blocks, err := s.store.Blocks(c, day, to)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 	data := gin.H{"Day": day, "Week": week, "Barbers": barbers, "Prev": day.AddDate(0, 0, -1), "Next": day.AddDate(0, 0, 1)}
 	if week {
 		data["Prev"], data["Next"] = day.AddDate(0, 0, -7), to
 		data["Days"] = groupByDay(day, bookings)
 	} else {
-		data["Rows"] = dayGrid(day, barbers, bookings)
+		data["Rows"] = dayGrid(day, barbers, bookings, blocks)
 	}
 	s.render(c, "dashboard.html", data)
 }
 
-func dayGrid(day time.Time, barbers []store.Barber, bookings []store.Booking) []adminRow {
+func dayGrid(day time.Time, barbers []store.Barber, bookings []store.Booking, blocks []store.Block) []adminRow {
 	var rows []adminRow
 	for _, t := range schedule.Slots(day) {
 		r := adminRow{Time: t}
@@ -67,6 +73,11 @@ func dayGrid(day time.Time, barbers []store.Barber, bookings []store.Booking) []
 			for i, b := range bookings {
 				if b.BarberID == br.ID && !t.Before(b.StartsAt) && t.Before(b.EndsAt) {
 					cell = adminCell{Booking: &bookings[i], Start: t.Equal(b.StartsAt)}
+				}
+			}
+			for i, b := range blocks {
+				if b.BarberID == br.ID && !t.Before(b.StartsAt) && t.Before(b.EndsAt) {
+					cell = adminCell{Block: &blocks[i], Start: t.Equal(b.StartsAt)}
 				}
 			}
 			r.Cells = append(r.Cells, cell)
@@ -115,4 +126,30 @@ func (s *Server) rescheduleBooking(c *gin.Context) {
 		return
 	}
 	c.Redirect(http.StatusSeeOther, "/admin?date="+start.Format(dateLayout))
+}
+
+func (s *Server) createBlock(c *gin.Context) {
+	barberID, _ := strconv.ParseInt(c.PostForm("barber_id"), 10, 64)
+	date := c.PostForm("date")
+	start, err1 := time.Parse(dateTimeLayout, date+"T"+c.PostForm("from"))
+	end, err2 := time.Parse(dateTimeLayout, date+"T"+c.PostForm("to"))
+	if err1 != nil || err2 != nil || !start.Before(end) {
+		c.String(http.StatusBadRequest, "Неверное время")
+		return
+	}
+	err := s.store.CreateBlock(c, store.Block{BarberID: barberID, StartsAt: start, EndsAt: end, Reason: c.PostForm("reason")})
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.Redirect(http.StatusSeeOther, "/admin?date="+date)
+}
+
+func (s *Server) deleteBlock(c *gin.Context) {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err := s.store.DeleteBlock(c, id); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.Redirect(http.StatusSeeOther, c.Request.Referer())
 }

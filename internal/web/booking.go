@@ -67,8 +67,16 @@ func (s *Server) bookingSlots(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	blocks, err := s.store.Blocks(c, day, day.AddDate(0, 0, 1))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 	busy := map[int64][]schedule.Interval{}
 	for _, b := range bookings {
+		busy[b.BarberID] = append(busy[b.BarberID], schedule.Interval{Start: b.StartsAt, End: b.EndsAt})
+	}
+	for _, b := range blocks {
 		busy[b.BarberID] = append(busy[b.BarberID], schedule.Interval{Start: b.StartsAt, End: b.EndsAt})
 	}
 	free := map[int64][]time.Time{}

@@ -73,3 +73,20 @@ func (s *Store) AdminHash(ctx context.Context, login string) (string, error) {
 	err := s.db.QueryRow(ctx, "SELECT password_hash FROM admins WHERE login = $1", login).Scan(&hash)
 	return hash, err
 }
+
+func (s *Store) Blocks(ctx context.Context, from, to time.Time) ([]Block, error) {
+	rows, _ := s.db.Query(ctx, `SELECT id, barber_id, starts_at, ends_at, reason FROM blocks
+		WHERE starts_at < $2 AND ends_at > $1 ORDER BY starts_at`, from, to)
+	return pgx.CollectRows(rows, pgx.RowToStructByPos[Block])
+}
+
+func (s *Store) CreateBlock(ctx context.Context, b Block) error {
+	_, err := s.db.Exec(ctx, "INSERT INTO blocks (barber_id, starts_at, ends_at, reason) VALUES ($1, $2, $3, $4)",
+		b.BarberID, b.StartsAt, b.EndsAt, b.Reason)
+	return err
+}
+
+func (s *Store) DeleteBlock(ctx context.Context, id int64) error {
+	_, err := s.db.Exec(ctx, "DELETE FROM blocks WHERE id = $1", id)
+	return err
+}

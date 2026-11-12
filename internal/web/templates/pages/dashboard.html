@@ -25,10 +25,26 @@
 <tr><th></th>{{range .Barbers}}<th>{{.Name}}</th>{{end}}</tr>
 {{range .Rows}}<tr>
 <td>{{.Time.Format "15:04"}}</td>
-{{range .Cells}}<td class="{{if .Booking}}bg-gray-200{{end}}">{{if .Start}}{{template "booking-admin" dict "Booking" .Booking "Barbers" $.Barbers}}{{end}}</td>{{end}}
+{{range .Cells}}<td class="{{if .Booking}}bg-gray-200{{else if .Block}}bg-red-100{{end}}">
+{{if and .Start .Booking}}{{template "booking-admin" dict "Booking" .Booking "Barbers" $.Barbers}}{{end}}
+{{if and .Start .Block}}{{or .Block.Reason "Закрыто"}}
+<form method="post" action="/admin/blocks/{{.Block.ID}}/delete"><button class="text-red-600">×</button></form>{{end}}
+</td>{{end}}
 </tr>
 {{end}}</table>
 </div>
+
+<details class="mt-4">
+<summary>Закрыть время</summary>
+<form method="post" action="/admin/blocks" class="grid gap-2 max-w-xs">
+<select name="barber_id">{{range .Barbers}}<option value="{{.ID}}">{{.Name}}</option>{{end}}</select>
+<input type="hidden" name="date" value="{{.Day.Format "2006-01-02"}}">
+<input type="time" name="from" step="1800" required>
+<input type="time" name="to" step="1800" required>
+<input name="reason" placeholder="Причина">
+<button class="border p-2">Закрыть</button>
+</form>
+</details>
 {{end}}
 {{end}}
 

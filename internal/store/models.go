@@ -29,3 +29,11 @@ type Booking struct {
 	ServiceName string
 	BarberName  string
 }
+
+type Block struct {
+	ID       int64
+	BarberID int64
+	StartsAt time.Time
+	EndsAt   time.Time
+	Reason   string
+}

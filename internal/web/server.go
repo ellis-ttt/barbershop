@@ -26,6 +26,9 @@ type Store interface {
 	Bookings(ctx context.Context, from, to time.Time) ([]store.Booking, error)
 	CancelBooking(ctx context.Context, id int64) error
 	RescheduleBooking(ctx context.Context, id, barberID int64, start time.Time) error
+	Blocks(ctx context.Context, from, to time.Time) ([]store.Block, error)
+	CreateBlock(ctx context.Context, b store.Block) error
+	DeleteBlock(ctx context.Context, id int64) error
 	AdminHash(ctx context.Context, login string) (string, error)
 }
 
@@ -58,6 +61,8 @@ func (s *Server) Routes() *gin.Engine {
 	admin.GET("", s.dashboard)
 	admin.POST("/bookings/:id/cancel", s.cancelBooking)
 	admin.POST("/bookings/:id/reschedule", s.rescheduleBooking)
+	admin.POST("/blocks", s.createBlock)
+	admin.POST("/blocks/:id/delete", s.deleteBlock)
 	return r
 }
 

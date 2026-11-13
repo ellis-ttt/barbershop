@@ -29,6 +29,8 @@ type Store interface {
 	Blocks(ctx context.Context, from, to time.Time) ([]store.Block, error)
 	CreateBlock(ctx context.Context, b store.Block) error
 	DeleteBlock(ctx context.Context, id int64) error
+	BookingsPerWeek(ctx context.Context) ([]store.Stat, error)
+	TopServices(ctx context.Context) ([]store.Stat, error)
 	AdminHash(ctx context.Context, login string) (string, error)
 }
 
@@ -63,6 +65,7 @@ func (s *Server) Routes() *gin.Engine {
 	admin.POST("/bookings/:id/reschedule", s.rescheduleBooking)
 	admin.POST("/blocks", s.createBlock)
 	admin.POST("/blocks/:id/delete", s.deleteBlock)
+	admin.GET("/stats", s.stats)
 	return r
 }
 
@@ -76,6 +79,12 @@ func loadPages(base *template.Template) map[string]*template.Template {
 }
 
 var funcs = template.FuncMap{
+	"pct": func(n, total int) int {
+		if total == 0 {
+			return 0
+		}
+		return n * 100 / total
+	},
 	"dict": func(kv ...any) map[string]any {
 		m := map[string]any{}
 		for i := 0; i < len(kv); i += 2 {

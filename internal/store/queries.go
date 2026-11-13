@@ -90,3 +90,22 @@ func (s *Store) DeleteBlock(ctx context.Context, id int64) error {
 	_, err := s.db.Exec(ctx, "DELETE FROM blocks WHERE id = $1", id)
 	return err
 }
+
+func (s *Store) BookingsPerWeek(ctx context.Context) ([]Stat, error) {
+	rows, _ := s.db.Query(ctx, `SELECT to_char(date_trunc('week', starts_at), 'DD.MM'), count(*)::int
+		FROM bookings
+		WHERE status = 'active' AND starts_at >= date_trunc('week', now()) - interval '7 weeks'
+		GROUP BY date_trunc('week', starts_at)
+		ORDER BY date_trunc('week', starts_at)`)
+	return pgx.CollectRows(rows, pgx.RowToStructByPos[Stat])
+}
+
+func (s *Store) TopServices(ctx context.Context) ([]Stat, error) {
+	rows, _ := s.db.Query(ctx, `SELECT s.name, count(*)::int
+		FROM bookings b JOIN services s ON s.id = b.service_id
+		WHERE b.status = 'active'
+		GROUP BY s.name
+		ORDER BY 2 DESC
+		LIMIT 5`)
+	return pgx.CollectRows(rows, pgx.RowToStructByPos[Stat])
+}

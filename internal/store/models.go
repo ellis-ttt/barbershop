@@ -37,3 +37,8 @@ type Block struct {
 	EndsAt   time.Time
 	Reason   string
 }
+
+type Stat struct {
+	Label string
+	Count int
+}

@@ -17,5 +17,5 @@ func (s *Server) index(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	s.render(c, "index.html", gin.H{"Services": services, "Barbers": barbers})
+	s.render(c, "index.html", gin.H{"Services": services, "Barbers": barbers, "Gallery": s.gallery})
 }

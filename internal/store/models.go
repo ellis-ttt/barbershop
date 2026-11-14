@@ -7,6 +7,7 @@ type Service struct {
 	Name        string
 	Price       int
 	DurationMin int
+	Description string
 }
 
 func (s Service) Duration() time.Duration {
@@ -14,8 +15,10 @@ func (s Service) Duration() time.Duration {
 }
 
 type Barber struct {
-	ID   int64
-	Name string
+	ID    int64
+	Name  string
+	Title string
+	Photo string
 }
 
 type Booking struct {

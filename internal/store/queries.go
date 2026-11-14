@@ -12,17 +12,17 @@ import (
 var ErrSlotTaken = errors.New("slot taken")
 
 func (s *Store) Services(ctx context.Context) ([]Service, error) {
-	rows, _ := s.db.Query(ctx, "SELECT id, name, price, duration_min FROM services ORDER BY id")
+	rows, _ := s.db.Query(ctx, "SELECT id, name, price, duration_min, description FROM services ORDER BY id")
 	return pgx.CollectRows(rows, pgx.RowToStructByPos[Service])
 }
 
 func (s *Store) Service(ctx context.Context, id int64) (Service, error) {
-	rows, _ := s.db.Query(ctx, "SELECT id, name, price, duration_min FROM services WHERE id = $1", id)
+	rows, _ := s.db.Query(ctx, "SELECT id, name, price, duration_min, description FROM services WHERE id = $1", id)
 	return pgx.CollectExactlyOneRow(rows, pgx.RowToStructByPos[Service])
 }
 
 func (s *Store) Barbers(ctx context.Context) ([]Barber, error) {
-	rows, _ := s.db.Query(ctx, "SELECT id, name FROM barbers ORDER BY id")
+	rows, _ := s.db.Query(ctx, "SELECT id, name, title, photo FROM barbers ORDER BY id")
 	return pgx.CollectRows(rows, pgx.RowToStructByPos[Barber])
 }
 

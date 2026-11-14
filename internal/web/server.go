@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path"
 	"time"
+	"unicode/utf8"
 
 	"barbershop/internal/store"
 
@@ -39,11 +40,21 @@ type Server struct {
 	partials *template.Template
 	pages    map[string]*template.Template
 	secret   []byte
+	gallery  []string
 }
 
 func New(st Store, secret string) *Server {
 	partials := template.Must(template.New("").Funcs(funcs).ParseFS(files, "templates/layout.html", "templates/partials/*.html"))
-	return &Server{store: st, partials: partials, pages: loadPages(partials), secret: []byte(secret)}
+	return &Server{store: st, partials: partials, pages: loadPages(partials), secret: []byte(secret), gallery: gallery()}
+}
+
+func gallery() []string {
+	entries, _ := fs.ReadDir(files, "static/gallery")
+	var images []string
+	for _, e := range entries {
+		images = append(images, "/static/gallery/"+e.Name())
+	}
+	return images
 }
 
 func (s *Server) Routes() *gin.Engine {
@@ -79,6 +90,10 @@ func loadPages(base *template.Template) map[string]*template.Template {
 }
 
 var funcs = template.FuncMap{
+	"initial": func(s string) string {
+		r, _ := utf8.DecodeRuneInString(s)
+		return string(r)
+	},
 	"pct": func(n, total int) int {
 		if total == 0 {
 			return 0

@@ -7,43 +7,51 @@
 <a href="#booking" class="ml-auto font-bold">Записаться</a>
 </nav>
 
-<header class="py-8">
-<h1 class="text-3xl font-bold">Бритва</h1>
-<p>Lorem ipsum dolor sit amet.</p>
-<a href="#booking" class="inline-block mt-4 border px-4 py-2">Записаться</a>
+<header class="py-12">
+<h1 class="text-4xl font-bold">Бритва</h1>
+<p class="mt-2">Мужские стрижки и бритьё в центре Москвы. Без очередей — по записи онлайн.</p>
+<a href="#booking" class="inline-block mt-6 border px-6 py-3">Записаться</a>
 </header>
 
-<section id="services" class="mt-6">
-<h2 class="text-xl">Услуги и цены</h2>
+<section id="services" class="mt-8">
+<h2 class="text-2xl">Услуги и цены</h2>
 <ul>
-{{range .Services}}<li class="flex justify-between border-b py-2"><span>{{.Name}}</span><span>{{.Price}} ₽</span></li>
+{{range .Services}}<li class="border-b py-3">
+<div class="flex justify-between"><span>{{.Name}}</span><span>{{.Price}} ₽</span></div>
+<p class="text-sm text-gray-500">{{.Description}} · {{.DurationMin}} мин</p>
+</li>
 {{end}}</ul>
 </section>
 
-<section id="barbers" class="mt-6">
-<h2 class="text-xl">Мастера</h2>
-<ul>
-{{range .Barbers}}<li>{{.Name}}</li>
-{{end}}</ul>
+<section id="barbers" class="mt-8">
+<h2 class="text-2xl">Мастера</h2>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">
+{{range .Barbers}}<div>
+{{if .Photo}}<img src="{{.Photo}}" alt="{{.Name}}" class="aspect-square w-full object-cover">
+{{else}}<div class="aspect-square bg-gray-200 flex items-center justify-center text-3xl">{{initial .Name}}</div>{{end}}
+<p class="mt-1 font-bold">{{.Name}}</p>
+<p class="text-sm text-gray-500">{{.Title}}</p>
+</div>
+{{end}}</div>
 </section>
 
-<section id="gallery" class="mt-6">
-<h2 class="text-xl">Галерея</h2>
-<div class="grid grid-cols-3 gap-2">
-<div class="aspect-square bg-gray-200"></div>
-<div class="aspect-square bg-gray-200"></div>
-<div class="aspect-square bg-gray-200"></div>
+<section id="gallery" class="mt-8">
+<h2 class="text-2xl">Галерея</h2>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+{{range .Gallery}}<img src="{{.}}" alt="" loading="lazy" class="aspect-square w-full object-cover">
+{{else}}{{range 6}}<div class="aspect-square bg-gray-200"></div>{{end}}{{end}}
 </div>
 </section>
 
-<section id="booking" class="mt-6 scroll-mt-12">
-<h2 class="text-xl">Запись</h2>
+<section id="booking" class="mt-8 scroll-mt-12">
+<h2 class="text-2xl">Онлайн-запись</h2>
 <div id="booking-step" hx-swap="innerHTML show:#booking:top">{{template "booking-services" .Services}}</div>
 </section>
 
-<section id="contacts" class="mt-6">
-<h2 class="text-xl">Контакты</h2>
-<p>Москва, ул. Примерная, 1</p>
-<p>+7 (999) 000-00-00</p>
+<section id="contacts" class="mt-8">
+<h2 class="text-2xl">Контакты</h2>
+<p>Москва, ул. Покровка, 12</p>
+<p><a href="tel:+74950000000">+7 (495) 000-00-00</a></p>
+<p>Ежедневно с 10:00 до 21:00</p>
 </section>
 {{end}}

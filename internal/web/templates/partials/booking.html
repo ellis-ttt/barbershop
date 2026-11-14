@@ -7,7 +7,7 @@
 
 {{define "booking-date"}}
 <p>{{.Service.Name}}. Выберите дату</p>
-<div x-data="calendar({{.Service.ID}})" class="max-w-xs">
+<div x-data="calendar({{.Service.ID}})" class="max-w-sm">
 <div class="flex justify-between">
 <button @click="shift(-1)">‹</button>
 <span x-text="title"></span>
@@ -16,7 +16,7 @@
 <div class="grid grid-cols-7 text-center">
 <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
 <template x-for="(d, i) in days" :key="i">
-<div><button x-show="d" x-text="d && d.getDate()" :disabled="d && past(d)" @click="pick(d)" :class="d && iso(d) === selected && 'bg-black text-white'" class="w-full p-1 disabled:text-gray-300"></button></div>
+<div><button x-show="d" x-text="d && d.getDate()" :disabled="d && past(d)" @click="pick(d)" :class="d && iso(d) === selected && 'bg-black text-white'" class="w-full p-2 disabled:text-gray-300"></button></div>
 </template>
 </div>
 </div>
@@ -28,8 +28,8 @@
 <table class="w-full text-center">
 <tr><th></th>{{range .Barbers}}<th>{{.Name}}</th>{{end}}</tr>
 {{range .Rows}}<tr>
-<td>{{.Time.Format "15:04"}}</td>
-{{range .Cells}}<td>{{if .Free}}<button class="border w-full" hx-get="/booking/details?service_id={{$.Service.ID}}&barber_id={{.BarberID}}&starts_at={{.Time.Format "2006-01-02T15:04"}}" hx-target="#booking-step">✓</button>{{else}}<span class="text-gray-300">—</span>{{end}}</td>{{end}}
+<td class="sticky left-0 bg-white pr-2">{{.Time.Format "15:04"}}</td>
+{{range .Cells}}<td>{{if .Free}}<button class="border w-full p-2" hx-get="/booking/details?service_id={{$.Service.ID}}&barber_id={{.BarberID}}&starts_at={{.Time.Format "2006-01-02T15:04"}}" hx-target="#booking-step">✓</button>{{else}}<span class="block p-2 text-gray-300">—</span>{{end}}</td>{{end}}
 </tr>
 {{end}}</table>
 </div>
@@ -41,8 +41,8 @@
 <input type="hidden" name="service_id" value="{{.Service.ID}}">
 <input type="hidden" name="barber_id" value="{{.BarberID}}">
 <input type="hidden" name="starts_at" value="{{.Start.Format "2006-01-02T15:04"}}">
-<input name="name" placeholder="Имя" required>
-<input name="phone" type="tel" placeholder="Телефон" required>
+<input name="name" placeholder="Имя" autocomplete="name" class="border p-2" required>
+<input name="phone" type="tel" placeholder="Телефон" autocomplete="tel" class="border p-2" required>
 <button class="border p-2">Записаться</button>
 </form>
 {{end}}

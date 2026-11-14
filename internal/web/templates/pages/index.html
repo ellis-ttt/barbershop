@@ -1,25 +1,33 @@
 {{define "content"}}
+<nav class="sticky top-0 bg-white flex gap-4 py-2 text-sm overflow-x-auto">
+<a href="#services">Услуги</a>
+<a href="#barbers">Мастера</a>
+<a href="#gallery">Галерея</a>
+<a href="#contacts">Контакты</a>
+<a href="#booking" class="ml-auto font-bold">Записаться</a>
+</nav>
+
 <header class="py-8">
 <h1 class="text-3xl font-bold">Бритва</h1>
 <p>Lorem ipsum dolor sit amet.</p>
 <a href="#booking" class="inline-block mt-4 border px-4 py-2">Записаться</a>
 </header>
 
-<section class="mt-6">
+<section id="services" class="mt-6">
 <h2 class="text-xl">Услуги и цены</h2>
 <ul>
 {{range .Services}}<li class="flex justify-between border-b py-2"><span>{{.Name}}</span><span>{{.Price}} ₽</span></li>
 {{end}}</ul>
 </section>
 
-<section class="mt-6">
+<section id="barbers" class="mt-6">
 <h2 class="text-xl">Мастера</h2>
 <ul>
 {{range .Barbers}}<li>{{.Name}}</li>
 {{end}}</ul>
 </section>
 
-<section class="mt-6">
+<section id="gallery" class="mt-6">
 <h2 class="text-xl">Галерея</h2>
 <div class="grid grid-cols-3 gap-2">
 <div class="aspect-square bg-gray-200"></div>
@@ -28,12 +36,12 @@
 </div>
 </section>
 
-<section id="booking" class="mt-6">
+<section id="booking" class="mt-6 scroll-mt-12">
 <h2 class="text-xl">Запись</h2>
-<div id="booking-step">{{template "booking-services" .Services}}</div>
+<div id="booking-step" hx-swap="innerHTML show:#booking:top">{{template "booking-services" .Services}}</div>
 </section>
 
-<section class="mt-6">
+<section id="contacts" class="mt-6">
 <h2 class="text-xl">Контакты</h2>
 <p>Москва, ул. Примерная, 1</p>
 <p>+7 (999) 000-00-00</p>

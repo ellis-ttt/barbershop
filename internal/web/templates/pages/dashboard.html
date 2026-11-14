@@ -27,7 +27,7 @@
 <table class="w-full text-sm">
 <tr><th></th>{{range .Barbers}}<th>{{.Name}}</th>{{end}}</tr>
 {{range .Rows}}<tr>
-<td>{{.Time.Format "15:04"}}</td>
+<td class="sticky left-0 bg-white pr-2">{{.Time.Format "15:04"}}</td>
 {{range .Cells}}<td class="{{if .Booking}}bg-gray-200{{else if .Block}}bg-red-100{{end}}">
 {{if and .Start .Booking}}{{template "booking-admin" dict "Booking" .Booking "Barbers" $.Barbers}}{{end}}
 {{if and .Start .Block}}{{or .Block.Reason "Закрыто"}}

@@ -39,7 +39,7 @@ func (s *Store) CancelBooking(ctx context.Context, id int64) error {
 }
 
 func (s *Store) RescheduleBooking(ctx context.Context, id, barberID int64, start time.Time) error {
-	_, err := s.db.Exec(ctx, `UPDATE bookings SET barber_id = $2, ends_at = $3 + (ends_at - starts_at), starts_at = $3
+	_, err := s.db.Exec(ctx, `UPDATE bookings SET barber_id = $2, ends_at = $3::timestamptz + (ends_at - starts_at), starts_at = $3
 		WHERE id = $1`, id, barberID, start)
 	return slotErr(err)
 }

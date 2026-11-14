@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"log"
+	"time"
+	_ "time/tzdata"
 
 	"barbershop/internal/config"
 	"barbershop/internal/store"
@@ -14,6 +16,11 @@ import (
 func main() {
 	ctx := context.Background()
 	cfg := config.Load()
+	loc, err := time.LoadLocation(cfg.Timezone)
+	if err != nil {
+		log.Fatal(err)
+	}
+	time.Local = loc
 	st, err := store.New(ctx, cfg.DatabaseURL)
 	if err != nil {
 		log.Fatal(err)

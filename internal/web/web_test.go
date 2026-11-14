@@ -97,7 +97,7 @@ func TestIndex(t *testing.T) {
 
 func TestBookingSlotsHidesBusy(t *testing.T) {
 	day := tomorrow()
-	start := time.Date(day.Year(), day.Month(), day.Day(), 10, 0, 0, 0, time.UTC)
+	start := time.Date(day.Year(), day.Month(), day.Day(), 10, 0, 0, 0, time.Local)
 	st := &fakeStore{bookings: []store.Booking{{BarberID: 1, StartsAt: start, EndsAt: start.Add(time.Hour)}}}
 	w := do(New(st, "s").Routes(), "GET", "/booking/slots?service_id=1&date="+day.Format(dateLayout), nil)
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -135,7 +135,7 @@ func TestAdminRequiresLogin(t *testing.T) {
 func TestLoginAndDashboard(t *testing.T) {
 	hash, _ := bcrypt.GenerateFromPassword([]byte("secret"), bcrypt.MinCost)
 	day := tomorrow()
-	start := time.Date(day.Year(), day.Month(), day.Day(), 11, 0, 0, 0, time.UTC)
+	start := time.Date(day.Year(), day.Month(), day.Day(), 11, 0, 0, 0, time.Local)
 	st := &fakeStore{
 		hash:     string(hash),
 		bookings: []store.Booking{{ID: 7, BarberID: 1, StartsAt: start, EndsAt: start.Add(time.Hour), ClientName: "Олег", ServiceName: "Стрижка"}},

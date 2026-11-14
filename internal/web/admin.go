@@ -29,10 +29,10 @@ type dayBookings struct {
 }
 
 func (s *Server) dashboard(c *gin.Context) {
-	day, err := time.Parse(dateLayout, c.Query("date"))
+	day, err := time.ParseInLocation(dateLayout, c.Query("date"), time.Local)
 	if err != nil {
 		y, m, d := time.Now().Date()
-		day = time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+		day = time.Date(y, m, d, 0, 0, 0, 0, time.Local)
 	}
 	week := c.Query("view") == "week"
 	to := day.AddDate(0, 0, 1)
@@ -111,7 +111,7 @@ func (s *Server) cancelBooking(c *gin.Context) {
 func (s *Server) rescheduleBooking(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	barberID, _ := strconv.ParseInt(c.PostForm("barber_id"), 10, 64)
-	start, err := time.Parse(dateTimeLayout, c.PostForm("starts_at"))
+	start, err := time.ParseInLocation(dateTimeLayout, c.PostForm("starts_at"), time.Local)
 	if err != nil {
 		c.String(http.StatusBadRequest, "Неверное время")
 		return
@@ -131,8 +131,8 @@ func (s *Server) rescheduleBooking(c *gin.Context) {
 func (s *Server) createBlock(c *gin.Context) {
 	barberID, _ := strconv.ParseInt(c.PostForm("barber_id"), 10, 64)
 	date := c.PostForm("date")
-	start, err1 := time.Parse(dateTimeLayout, date+"T"+c.PostForm("from"))
-	end, err2 := time.Parse(dateTimeLayout, date+"T"+c.PostForm("to"))
+	start, err1 := time.ParseInLocation(dateTimeLayout, date+"T"+c.PostForm("from"), time.Local)
+	end, err2 := time.ParseInLocation(dateTimeLayout, date+"T"+c.PostForm("to"), time.Local)
 	if err1 != nil || err2 != nil || !start.Before(end) {
 		c.String(http.StatusBadRequest, "Неверное время")
 		return

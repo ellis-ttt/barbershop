@@ -52,7 +52,7 @@ func (s *Server) bookingSlots(c *gin.Context) {
 	if !ok {
 		return
 	}
-	day, err := time.Parse(dateLayout, c.Query("date"))
+	day, err := time.ParseInLocation(dateLayout, c.Query("date"), time.Local)
 	if err != nil {
 		c.String(http.StatusBadRequest, "Неверная дата")
 		return
@@ -99,7 +99,7 @@ func (s *Server) bookingDetails(c *gin.Context) {
 	if !ok {
 		return
 	}
-	start, err := time.Parse(dateTimeLayout, c.Query("starts_at"))
+	start, err := time.ParseInLocation(dateTimeLayout, c.Query("starts_at"), time.Local)
 	if err != nil {
 		c.String(http.StatusBadRequest, "Неверное время")
 		return
@@ -108,7 +108,7 @@ func (s *Server) bookingDetails(c *gin.Context) {
 }
 
 func (s *Server) createBooking(c *gin.Context) {
-	start, err := time.Parse(dateTimeLayout, c.PostForm("starts_at"))
+	start, err := time.ParseInLocation(dateTimeLayout, c.PostForm("starts_at"), time.Local)
 	if err != nil {
 		c.String(http.StatusBadRequest, "Неверное время")
 		return

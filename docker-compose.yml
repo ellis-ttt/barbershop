@@ -9,6 +9,10 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U barber -d barbershop"]
+      interval: 2s
+      retries: 10
 
   app:
     build: .
@@ -20,7 +24,8 @@ services:
       ADMIN_PASSWORD: admin
       JWT_SECRET: change-me
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   pgdata:
